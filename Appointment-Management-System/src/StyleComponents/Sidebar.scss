@@ -1,0 +1,31 @@
+@import url(../assets/Styles/global.scss);
+*{
+    font-family: var(--poppinsFont);
+}
+.sidebar{
+    background-color: black;
+    width: 25%;
+    height: 100vh;
+    .sidebar-header{
+        padding-top: 5%;
+        color: white;
+        text-align: center;
+    }
+    .sidebar-menu,.logout-btn{
+        padding: 5%;
+        margin-left: 25%;
+        justify-content: center;
+        align-items: center;
+    }
+    a{
+        all: unset;
+        color: white;
+    }
+    .sidebar-menu> li{
+        all:unset;
+        display: flex;
+        flex-direction: column;
+        padding: 2%;
+        cursor: pointer;
+    }
+}
