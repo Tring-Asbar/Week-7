@@ -5,7 +5,7 @@ type Role = 'admin' | 'doctor' | 'patient'
 
 
 
-const userRole:Role = 'patient'
+const userRole:Role = localStorage.getItem("userRole") as Role
 const DashboardLayout = () => {
   
 

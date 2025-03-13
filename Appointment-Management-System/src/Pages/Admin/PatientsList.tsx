@@ -44,7 +44,6 @@ const PatientsList = () => {
               </TableRow>
             ))}
             </TableBody>
-            
         </Table>
         </TableContainer>
         </div>

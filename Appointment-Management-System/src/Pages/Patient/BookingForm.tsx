@@ -1,13 +1,17 @@
-import { FormControl,InputLabel,Button,Select,MenuItem,Dialog,DialogActions,DialogContent, TextField, DialogTitle } from "@mui/material"
+import { Button,Dialog,DialogActions,DialogContent, TextField, DialogTitle } from "@mui/material"
 import { SubmitHandler,useForm } from "react-hook-form";
-import { useCallback,useState,useEffect } from "react";
+import { useCallback } from "react";
+import { useMutation,gql } from "@apollo/client";
+import ToastMessage from "../../Toast/ToastMessage";
 import '../../StyleComponents/BookingForm.scss';
+
+
 
 type FormData={
     name:string
     email:string
     location:string
-    time:string
+    dateTime:string
     disease:string
     doctor:string
 
@@ -15,56 +19,93 @@ type FormData={
 type BookingFormProps= {
     open: boolean;
     onClose: () => void;
+    selectedDoctor:string
+}
+
+
+const book_Appointment = gql`
+  mutation BookAppointment($patient_name: String!, $patient_email: String!, $patient_location: String!, $patient_disease: String!, $patient_selecteddoctors: String!,$patient_appointmenttime:String!) {
+    bookAppointment(patient_name: $patient_name, patient_email: $patient_email, patient_location: $patient_location, patient_disease: $patient_disease, patient_selecteddoctors: $patient_selecteddoctors,patient_appointmenttime:$patient_appointmenttime) {
+      patient_name
+      patient_email
+      patient_location
+      patient_disease
+      patient_selecteddoctors
+      patient_appointmenttime
+    }
   }
+`;
 
 
-import { useLazyQuery,gql } from "@apollo/client";
-
-const get_Doctor_Users = gql`
-  query GetDoctorUsers{
-      getDoctorUsers{
-          user_name,user_email,user_phone,user_password,user_role
-      }
-  }
-` 
 
 
-const BookingForm = ({ open, onClose }: BookingFormProps) =>{
+// const get_Doctor_Users = gql`
+//   query GetDoctorUsers{
+//       getDoctorUsers{
+//           user_name,user_email,user_phone,user_password,user_role
+//       }
+//   }
+// ` 
+
+
+const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
 
     const {register,formState:{errors},handleSubmit} = useForm<FormData>({
         defaultValues:{
             name:"",
             email:"",
             location:"",
-            time:"",
+            dateTime:"",
             disease:"",
-            doctor:""
+            doctor: selectedDoctor || "",
         },
         mode:"onChange"
     });
 
-    const [getDoctorUsers, { data}] = useLazyQuery(get_Doctor_Users);
-    const [doctors, setDoctors] = useState<string[]>([]);
+    // const [getDoctorUsers, { data}] = useLazyQuery(get_Doctor_Users);
+    // const [doctors, setDoctors] = useState<string[]>([]);
     
-
+    const [bookAppointment] = useMutation(book_Appointment);
 
     // Fetch doctors' names when the component mounts
-    useEffect(() => {
-        getDoctorUsers();
-    }, [getDoctorUsers]);
+    // useEffect(() => {
+    //     getDoctorUsers();
+    // }, [getDoctorUsers]);
 
-    // Update the doctors' list when data is fetched
-    useEffect(() => {
-        if (data && data.getDoctorUsers) {
-            const doctorNames = data.getDoctorUsers.map((doctor: { user_name: string }) => doctor.user_name);
-            setDoctors(doctorNames);
-        }
-    }, [data]);
+    // // Update the doctors' list when data is fetched
+    // useEffect(() => {
+    //     if (data && data.getDoctorUsers) {
+    //         const doctorNames = data.getDoctorUsers.map((doctor: { user_name: string }) => doctor.user_name);
+    //         setDoctors(doctorNames);
+    //     }
+    // }, [data]);
 
     const onSubmit: SubmitHandler<FormData> = useCallback(async(values) => {
         console.log(values);
-        onClose();
+        try{
+            const {data} = await bookAppointment({
+                variables: {
+                    patient_name:values.name,
+                    patient_email:values.email,
+                    patient_location:values.location,
+                    patient_disease:values.disease,
+                    patient_selecteddoctors:values.doctor,
+                    patient_appointmenttime:values.dateTime
+                },
+            });
+            if(data){
+                ToastMessage({message:"Appointment booked successfully,Details sent to your email",toastType:"success"})
+                onClose();
+            }
+        }
+        catch (err) {
+            ToastMessage({ message: "Booking failed", toastType: "error" });
+            console.error("Booking error:", err);
+          }
+
     },[onClose]);
+
+    
 
     return(
       <div className="form-container">
@@ -104,7 +145,7 @@ const BookingForm = ({ open, onClose }: BookingFormProps) =>{
                         pattern:{value:/^[^\s@]+@[^\s@]+\.[^\s@]+$/,message:"Invalid email format"}
                     })}
                     />
-                    {errors.name && <p style={{color:"red"}}>{errors.name.message}</p> }
+                    {errors.email && <p style={{color:"red"}}>{errors.email.message}</p> }
                 </DialogContent>
             </div>
             <div className="fields">
@@ -128,6 +169,22 @@ const BookingForm = ({ open, onClose }: BookingFormProps) =>{
                 <DialogContent>
                     <TextField fullWidth
                     variant='outlined'
+                    // label='Appointment Time'
+                    type='datetime-local'
+                    className="field"
+                    placeholder="Enter Date and Time"
+                    {...register("dateTime",{
+                        required:"Date and Time is required",
+                    })}
+                    />
+                    {errors.dateTime && <p style={{color:"red"}}>{errors.dateTime.message}</p> }
+                </DialogContent>
+            </div>
+
+            <div className="fields">
+                <DialogContent>
+                    <TextField fullWidth
+                    variant='outlined'
                     label='Disease'
                     type='text'
                     className="field"
@@ -141,30 +198,18 @@ const BookingForm = ({ open, onClose }: BookingFormProps) =>{
                 </DialogContent>
             </div>
             <div className="fields">
-                <DialogContent>
-                    <FormControl fullWidth>
-                    <InputLabel className='field'>Doctors</InputLabel>
-
-                    <Select
-                    label="Role"
-                    className='field'
-                    {...register("doctor",{
-                    })} 
-                    >
-                    {doctors.map((doctor, index) => (
-                        <MenuItem key={index} value={doctor}>
-                            {doctor}
-                        </MenuItem>
-                    ))}
-
-                    </Select>
-                    
-
-                    </FormControl>
-                    {errors.doctor && <p style={{color:"red"}}>{errors.doctor.message}</p> }
-                    
-
-                </DialogContent>
+            <DialogContent>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Doctor"
+            type="text"
+            className="field"
+            {...register("doctor")}
+            InputProps={{ readOnly: true }} // Make field read-only
+          />
+          {errors.doctor && <p style={{ color: "red" }}>{errors.doctor.message}</p>}
+        </DialogContent>
             </div>
           <DialogActions>
             <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
