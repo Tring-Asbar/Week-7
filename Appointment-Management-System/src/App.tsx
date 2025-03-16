@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import LoginForm from "./Login/LoginForm";
 import SignUpForm from "./SignUp/SignUpForm";
 import Home from "./Pages/Home";
@@ -12,11 +12,13 @@ import DoctorDashboard from "./Pages/Doctor/DoctorDashboard";
 import AppointmentsList from "./Pages/Doctor/AppointmentsList";
 import PatientDashboard from "./Pages/Patient/PatientDashboard";
 import AppointmentBooking from "./Pages/Patient/AppointmentBooking";
+import DoctorProfile from "./Pages/Doctor/DoctorProfile";
+import ViewAppointments from "./Pages/Patient/ViewAppointments";
 
 function App() {
-  const isLoggedIn = localStorage.getItem("userRole"); 
-  const location = useLocation(); 
-
+  const userRole = localStorage.getItem("userRole"); // Check if user is logged in
+  // const location = useLocation();
+//  localStorage.clear()
   const publicRoutes = [
     { path: "/", element: <Home /> },
     { path: "/login", element: <LoginForm /> },
@@ -29,46 +31,49 @@ function App() {
     { path: "/admin/patientlist", element: <PatientsList />, allowedRoles: ["admin"] },
     { path: "/doctor", element: <DoctorDashboard />, allowedRoles: ["doctor"] },
     { path: "/doctor/appointments", element: <AppointmentsList />, allowedRoles: ["doctor"] },
+    { path: "/doctor/profile", element:<DoctorProfile/>, allowedRoles :["doctor"]},
     { path: "/patient", element: <PatientDashboard />, allowedRoles: ["patient"] },
-    { path: "/patient/bookings", element: <AppointmentBooking />, allowedRoles: ["patient"] }
+    { path: "/patient/bookings", element: <AppointmentBooking />, allowedRoles: ["patient"] },
+    { path: "/patient/viewappointments", element:<ViewAppointments/>, allowedRoles: ['patient']}
   ];
 
   return (
-    <>
-      <Routes>
-        <Route element={<AuthLayout />}>
-          {publicRoutes.map((route) => (
-            <Route 
-              key={route.path} 
-              path={route.path} 
-              element={
-                isLoggedIn && (route.path === "/login" || route.path === "/signup")
-                  ? <Navigate to={location.pathname} replace /> // Stay on the current page
-                  : route.element
-              } 
-            />
-          ))}
-        </Route>
+    <Routes>
+      {/* Public Routes - Redirect logged-in users away from login/signup */}
+      <Route element={<AuthLayout />}>
+        {publicRoutes.map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              userRole && (route.path === "/login" || route.path === "/signup" || route.path==='/') ? (
+                <Navigate to={`/${userRole}`} replace /> // Redirect logged-in users to their dashboard
+              ) : (
+                route.element
+              )
+            }
+          />
+        ))}
+      </Route>
 
-        {/* Private Dashboard Routes */}
-        <Route element={<DashboardLayout />}>
-          {privateRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <ProtectedRoutes allowedRoles={route.allowedRoles}>
-                  {route.element}
-                </ProtectedRoutes>
-              }
-            />
-          ))}
-        </Route>
+      {/* Private Routes - Ensure access control */}
+      <Route element={<DashboardLayout />}>
+        {privateRoutes.map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              <ProtectedRoutes allowedRoles={route.allowedRoles}>
+                {route.element}
+              </ProtectedRoutes>
+            }
+          />
+        ))}
+      </Route>
 
-        {/* Redirect unknown routes to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </>
+      {/* Redirect unknown routes to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

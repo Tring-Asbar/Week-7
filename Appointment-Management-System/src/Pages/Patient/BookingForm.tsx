@@ -19,7 +19,8 @@ type FormData={
 type BookingFormProps= {
     open: boolean;
     onClose: () => void;
-    selectedDoctor:string
+    selectedDoctor?:string
+    initialValues?: FormData
 }
 
 
@@ -108,7 +109,6 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
     
 
     return(
-      <div className="form-container">
         
         <Dialog open={open} onClose={onClose}  maxWidth='sm' fullWidth>
         <DialogTitle maxWidth='sm'>
@@ -116,13 +116,11 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
         </DialogTitle>
         
         <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="fields">
                 <DialogContent>
                     <TextField fullWidth 
                     variant='outlined'
                     label='Name'
                     type='text'
-                    className="field"
                     placeholder="Enter name"
                     {...register("name",{
                         required:"Name is required",
@@ -131,14 +129,11 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
                     />
                     {errors.name && <p style={{color:"red"}}>{errors.name.message}</p> }
                 </DialogContent>
-            </div>
-            <div className="fields">
                 <DialogContent>
                     <TextField fullWidth 
                     variant='outlined'
                     label='Email'
                     type='text'
-                    className="field"
                     placeholder="Enter email"
                     {...register("email",{
                         required:"Email is required",
@@ -147,14 +142,11 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
                     />
                     {errors.email && <p style={{color:"red"}}>{errors.email.message}</p> }
                 </DialogContent>
-            </div>
-            <div className="fields">
                 <DialogContent>
                     <TextField fullWidth
                     variant='outlined'
                     label='Location'
                     type='text'
-                    className="field"
                     placeholder="Enter Location"
                     {...register("location",{
                         required:"Location is required",
@@ -163,15 +155,12 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
                     />
                     {errors.location && <p style={{color:"red"}}>{errors.location.message}</p> }
                 </DialogContent>
-            </div>
 
-            <div className="fields">
                 <DialogContent>
                     <TextField fullWidth
                     variant='outlined'
                     // label='Appointment Time'
                     type='datetime-local'
-                    className="field"
                     placeholder="Enter Date and Time"
                     {...register("dateTime",{
                         required:"Date and Time is required",
@@ -179,15 +168,12 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
                     />
                     {errors.dateTime && <p style={{color:"red"}}>{errors.dateTime.message}</p> }
                 </DialogContent>
-            </div>
 
-            <div className="fields">
                 <DialogContent>
                     <TextField fullWidth
                     variant='outlined'
                     label='Disease'
                     type='text'
-                    className="field"
                     placeholder="Enter Disease"
                     {...register("disease",{
                         required:"Disease is required",
@@ -196,28 +182,23 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
                     />
                     {errors.disease && <p style={{color:"red"}}>{errors.disease.message}</p> }
                 </DialogContent>
-            </div>
-            <div className="fields">
             <DialogContent>
           <TextField
             fullWidth
             variant="outlined"
             label="Doctor"
             type="text"
-            className="field"
             {...register("doctor")}
             InputProps={{ readOnly: true }} // Make field read-only
           />
           {errors.doctor && <p style={{ color: "red" }}>{errors.doctor.message}</p>}
         </DialogContent>
-            </div>
           <DialogActions>
             <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
             <Button variant="contained" type="submit" color="primary">Submit</Button>
           </DialogActions>
         </form>
         </Dialog>
-      </div>
     )
   }
 

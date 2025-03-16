@@ -5,24 +5,16 @@ import '../StyleComponents/UserForm.scss';
 import { useNavigate } from 'react-router-dom';
 import ToastMessage from '../Toast/ToastMessage';
 import bcrypt from 'bcryptjs';
+import { useLazyQuery} from '@apollo/client';
+import { get_User_By_Email } from './LoginFormApi';
 
 interface FormData {
   email: string;
   password: string;
 }
 
-import { useLazyQuery, gql } from '@apollo/client';
 
-const get_User_By_Email = gql`
-  query GetUserByEmail($user_email: String!) {
-    getUserByEmail(user_email: $user_email) {
-      user_name
-      user_email
-      user_password
-      user_role
-    }
-  }
-`;
+
 
 const LoginForm = () => {
   const navigate = useNavigate();

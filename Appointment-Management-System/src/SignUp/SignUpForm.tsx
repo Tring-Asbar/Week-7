@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ToastMessage from "../Toast/ToastMessage";
 import bcrypt from "bcryptjs";
+import { useMutation } from "@apollo/client";
+import { create_User } from "./SignUpFormApi";
 
 interface FormData {
   name: string;
@@ -16,19 +18,7 @@ interface FormData {
   role: string;
 }
 
-import { useMutation, gql } from "@apollo/client";
 
-const create_User = gql`
-  mutation CreateUser($user_name: String!, $user_email: String!, $user_phone: String!, $user_password: String!, $user_role: String!) {
-    createUser(user_name: $user_name, user_email: $user_email, user_phone: $user_phone, user_password: $user_password, user_role: $user_role) {
-      user_name
-      user_email
-      user_phone
-      user_password
-      user_role
-    }
-  }
-`;
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -145,6 +135,7 @@ const SignUpForm = () => {
               required: "Mobile number is required",
               pattern: { value: /^[0-9\s]+$/, message: "Invalid Mobile Number" },
               maxLength: { value: 10, message: "Mobile number contains 10 digits" },
+              minLength: { value: 10, message: "Mobile number contains 10 digits" },
             })}
           />
           {errors.mobileNumber && <p className="err-msg">{errors.mobileNumber.message}</p>}

@@ -1,0 +1,25 @@
+.home_cover{
+    height: 100vh;
+}
+
+.home_container{
+    // background-color:#8cb2d8;
+    display: flex;
+    // margin-left: 9%;
+    // gap: 60%;
+    justify-content: center;
+    img{
+        background-color: transparent;
+        // margin: 9%
+    }
+    .home_buttons{
+        margin: 3%;
+    }  
+}
+.home_content{
+    padding: 4% 4% 4% 6%;
+    line-height: 30px;
+    p{
+        width: 40%;
+    }
+}

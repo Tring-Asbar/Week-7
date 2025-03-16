@@ -15,11 +15,12 @@ const sidebarConfig = {
   doctor: [
     { path: "/doctor", label: "Dashboard", },
     { path: "/doctor/appointments", label: "Appointments",  },
+    { path: "/doctor/profile", label: "Profile"}
   ],
   patient: [
     { path: "/patient", label: "Dashboard", },
     { path: "/patient/bookings", label: "Book Appointment", },
-    { path: "/patient/history", label: "History",  },
+    { path:"/patient/viewappointments" , label:"View Appointments"}
   ],
 };
 type SideBarProps={
