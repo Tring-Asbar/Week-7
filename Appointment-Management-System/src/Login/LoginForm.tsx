@@ -1,23 +1,25 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback,useState, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField,FormControl,IconButton,InputLabel,OutlinedInput,InputAdornment } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 import '../StyleComponents/UserForm.scss';
 import { useNavigate } from 'react-router-dom';
 import ToastMessage from '../Toast/ToastMessage';
-import bcrypt from 'bcryptjs';
-import { useLazyQuery} from '@apollo/client';
-import { get_User_By_Email } from './LoginFormApi';
+import { useMutation} from '@apollo/client';
+import { login_user } from './LoginFormApi';
 
 interface FormData {
   email: string;
   password: string;
 }
 
-
-
-
 const LoginForm = () => {
   const navigate = useNavigate();
+  const [showPassword,setShowPassword] = useState(false)
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const { register, formState: { errors }, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
@@ -27,38 +29,27 @@ const LoginForm = () => {
     mode: 'onChange',
   });
 
-  const [getUserByEmail] = useLazyQuery(get_User_By_Email);
+  const [login] = useMutation(login_user);
 
   const onSubmit: SubmitHandler<FormData> = useCallback(async (values) => {
-    console.log('User Data:', values);
-
     try {
-      const { data } = await getUserByEmail({ variables: { user_email: values.email } });
-      if (data && data.getUserByEmail) {
-        const user = data.getUserByEmail;
-
-        // Compare the entered password with the hashed password stored in the database
-        const isPasswordCorrect = await bcrypt.compare(values.password, user.user_password);
-
-        if (isPasswordCorrect) {
-          //  localStorage.setItem('token', user.token);
-          localStorage.setItem('userRole', user.user_role.toLowerCase());
-
-          console.log('User Role:', user.user_role);
-          //  console.log('JWT Token:', user.token);
-          
-         
-          navigate('/patient');
-          window.location.reload();
-          ToastMessage({ message: 'Logged in successfully', toastType: 'success' });
-        } else {
-          ToastMessage({ message: 'Incorrect Password', toastType: 'error' });
-        }
+      const { data } = await login({ variables: { input:{ user_email: values.email, user_password: values.password }} });
+      console.log(data.login)
+      if (data && data.login) {
+        localStorage.setItem('token', data.login.token);
+        localStorage.setItem('userRole',data.login.role.toLowerCase());
+        localStorage.setItem('name',data.login.name)
+        console.log(data.login.token)
+        
+  
+        navigate('/patient');
+        window.location.reload();
+        ToastMessage({ message: 'Logged in successfully', toastType: 'success' });
       } else {
-        ToastMessage({ message: 'User not found', toastType: 'error' });
+        ToastMessage({ message: 'Invalid credentials', toastType: 'error' });
       }
     } catch (err) {
-      console.error('Error fetching user:', err);
+      console.error('Login Error:', err);
       ToastMessage({ message: 'An error occurred, please try again', toastType: 'error' });
     }
   }, []);
@@ -90,23 +81,39 @@ const LoginForm = () => {
           />
           {errors.email && <p className='err-msg'>{errors.email.message}</p>}
         </div>
-        <div className='fields'>
-          <div className='row'>
-            <TextField
-              variant='outlined'
-              label='Password'
-              type='password'
-              className='field'
-              placeholder='Enter Password'
-              {...register('password', {
-                required: 'Password is required',
-                minLength: { value: 8, message: 'Password must be at least 8 characters' },
-              })}
-            />
-          </div>
 
+        <div className="fields">
+
+        <FormControl sx={{  width: '100%' }} variant="outlined" >
+          <InputLabel htmlFor="outlined-adornment-password" className='field'>Password</InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder='Enter Password'
+            className='field'
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 8, message: 'Password must be at least 8 characters' },
+            })}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showPassword ? 'hide the password' : 'display the password'
+                  }
+                  onClick={handleClickShowPassword}
+                >
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+          />
           {errors.password && <p className='err-msg'>{errors.password.message}</p>}
+        </FormControl>
+
         </div>
+
         <div className='fields'>
           <Button variant='contained' className='field' type='submit'>
             Submit

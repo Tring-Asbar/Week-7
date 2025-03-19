@@ -1,16 +1,11 @@
 import { Button } from "@mui/material"
 import {  useState } from "react"
 import BookingForm from "./BookingForm"
-import { useQuery,gql } from "@apollo/client"
+import { useQuery } from "@apollo/client"
 
 
-const get_Doctor_Users = gql`
-  query GetDoctorUsers{
-      getDoctorUsers{
-        user_name,user_email,user_phone,user_password,user_role
-      }
-  }
-`
+import { get_Doctor_Users } from "../Admin/DoctorListApi"
+
 
 const AppointmentBooking = () => {
 
@@ -18,13 +13,16 @@ const AppointmentBooking = () => {
 
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
 
+  
+
   const setBookButtonState  = (a:boolean) =>{
     setBookButton(a);
   }
   const handleBookNow=(doctorName:string)=>{
     setSelectedDoctor(doctorName);
   }
-
+  
+  const name = localStorage.getItem('name')|| ""
   const {data} = useQuery(get_Doctor_Users)
 
 
@@ -34,7 +32,7 @@ const AppointmentBooking = () => {
 
         <div className="booking_cover">
         {data?.getDoctorUsers?.map((doctor: any) => (
-          <div className="booking_list">
+          <div className="booking_list" key={doctor.user_email}>
             <label>{doctor.user_name} </label>
             <label> Skin Specialist</label>
             <label> Mon - Fri </label>
@@ -56,6 +54,7 @@ const AppointmentBooking = () => {
                   open={bookButton}
                   onClose={() => setBookButtonState(false)}
                   selectedDoctor={selectedDoctor} 
+                  applicantName={name}
                 />
               )}
         </div>

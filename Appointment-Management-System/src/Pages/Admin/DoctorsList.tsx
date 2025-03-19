@@ -1,4 +1,5 @@
-import { useQuery,gql } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { get_Doctor_Users } from "./DoctorListApi";
 import {
     Table,
     TableBody,
@@ -10,13 +11,7 @@ import {
   } from '@mui/material';
 
 
-  const get_Doctor_Users = gql`
-  query GetDoctorUsers{
-      getDoctorUsers{
-        user_name,user_email,user_phone,user_password,user_role
-      }
-  }
-`
+
 
  
 

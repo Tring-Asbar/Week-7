@@ -1,38 +1,9 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Dialog, DialogTitle, DialogContent, TextField, Button } from "@mui/material";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ToastMessage from "../../Toast/ToastMessage";
-
-const UPDATE_APPOINTMENT = gql`
-  mutation UpdateAppointment(
-    $patient_appointmentid: Int!,
-    $patient_name: String!,
-    $patient_email: String!,
-    $patient_location: String!,
-    $patient_disease: String!,
-    $patient_selecteddoctors: String!,
-    $patient_appointmenttime: String!
-  ) {
-    updateAppointment(
-      patient_appointmentid: $patient_appointmentid,
-      patient_name: $patient_name,
-      patient_email: $patient_email,
-      patient_location: $patient_location,
-      patient_disease: $patient_disease,
-      patient_selecteddoctors: $patient_selecteddoctors,
-      patient_appointmenttime: $patient_appointmenttime
-    ) {
-      patient_appointmentid
-      patient_name
-      patient_email
-      patient_location
-      patient_disease
-      patient_selecteddoctors
-      patient_appointmenttime
-    }
-  }
-`;
+import { UPDATE_APPOINTMENT } from "./UpdateAppointmentApi";
 
 const EditForm = ({ open, onClose, initialValues }: any) => {
   const { control, handleSubmit, reset } = useForm({
@@ -65,6 +36,7 @@ const EditForm = ({ open, onClose, initialValues }: any) => {
       }
 
       const variables = {
+        input:{
         patient_appointmentid: initialValues.patient_appointmentid,
         patient_name: data.patient_name,
         patient_email: data.patient_email,
@@ -72,6 +44,7 @@ const EditForm = ({ open, onClose, initialValues }: any) => {
         patient_disease: data.patient_disease,
         patient_selecteddoctors: data.patient_selecteddoctors,
         patient_appointmenttime: data.patient_appointmenttime,
+        }
       };
 
       console.log("Sending Mutation Request:", variables);
@@ -91,7 +64,9 @@ const EditForm = ({ open, onClose, initialValues }: any) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Edit Appointment</DialogTitle>
+      <DialogTitle>
+        <h3>Edit Appointment</h3>
+        </DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller

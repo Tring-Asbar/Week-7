@@ -1,13 +1,15 @@
 import { Button,Dialog,DialogActions,DialogContent, TextField, DialogTitle } from "@mui/material"
 import { SubmitHandler,useForm } from "react-hook-form";
 import { useCallback } from "react";
-import { useMutation,gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ToastMessage from "../../Toast/ToastMessage";
 import '../../StyleComponents/BookingForm.scss';
+import  {book_Appointment}  from "./BookAppointmentApi"
 
 
 
 type FormData={
+    applicant_name:String
     name:string
     email:string
     location:string
@@ -21,21 +23,9 @@ type BookingFormProps= {
     onClose: () => void;
     selectedDoctor?:string
     initialValues?: FormData
+    applicantName:string
 }
 
-
-const book_Appointment = gql`
-  mutation BookAppointment($patient_name: String!, $patient_email: String!, $patient_location: String!, $patient_disease: String!, $patient_selecteddoctors: String!,$patient_appointmenttime:String!) {
-    bookAppointment(patient_name: $patient_name, patient_email: $patient_email, patient_location: $patient_location, patient_disease: $patient_disease, patient_selecteddoctors: $patient_selecteddoctors,patient_appointmenttime:$patient_appointmenttime) {
-      patient_name
-      patient_email
-      patient_location
-      patient_disease
-      patient_selecteddoctors
-      patient_appointmenttime
-    }
-  }
-`;
 
 
 
@@ -49,10 +39,11 @@ const book_Appointment = gql`
 // ` 
 
 
-const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
+const BookingForm = ({ open, onClose ,selectedDoctor,applicantName }: BookingFormProps) =>{
 
     const {register,formState:{errors},handleSubmit} = useForm<FormData>({
         defaultValues:{
+            applicant_name:applicantName || "",
             name:"",
             email:"",
             location:"",
@@ -86,12 +77,15 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
         try{
             const {data} = await bookAppointment({
                 variables: {
+                    input:{
                     patient_name:values.name,
                     patient_email:values.email,
                     patient_location:values.location,
                     patient_disease:values.disease,
                     patient_selecteddoctors:values.doctor,
-                    patient_appointmenttime:values.dateTime
+                    patient_appointmenttime:values.dateTime,
+                    applicant_name:values.applicant_name
+                    }
                 },
             });
             if(data){
@@ -116,6 +110,20 @@ const BookingForm = ({ open, onClose ,selectedDoctor }: BookingFormProps) =>{
         </DialogTitle>
         
         <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+                    <TextField fullWidth 
+                    variant='outlined'
+                    label='Applicant Name'
+                    type='text'
+                    placeholder="Enter name"
+                    {...register("applicant_name",{
+                        required:"Name is required",
+                        pattern:{value:/^[a-zA-Z\s]+$/,message:"Name contains only alphabets"}
+                    })}
+                    InputProps={{ readOnly: true }}
+                    />
+                    {errors.applicant_name && <p style={{color:"red"}}>{errors.applicant_name.message}</p> }
+                </DialogContent>
                 <DialogContent>
                     <TextField fullWidth 
                     variant='outlined'

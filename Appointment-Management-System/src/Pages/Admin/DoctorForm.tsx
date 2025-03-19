@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Button, TextField,FormControl,MenuItem, Select,IconButton,InputLabel,OutlinedInput,InputAdornment } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import "../StyleComponents/UserForm.scss";
+import { Button, InputLabel, FormControl, MenuItem, Select, TextField } from "@mui/material";
+import "../../StyleComponents/UserForm.scss"
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import ToastMessage from "../Toast/ToastMessage";
+import ToastMessage from "../../Toast/ToastMessage";
 import bcrypt from "bcryptjs";
 import { useMutation } from "@apollo/client";
-import { create_User } from "./SignUpFormApi";
+import { create_User } from "../../SignUp/SignUpFormApi";
 
 interface FormData {
   name: string;
@@ -22,16 +20,9 @@ interface FormData {
 
 
 
-const SignUpForm = () => {
+const DoctorForm = () => {
   const navigate = useNavigate();
   const [id, setId] = useState<string | null>(null);
-
-  const [showPassword,setShowPassword] = useState(false)
-  const [showConfirmPassword,setShowConfirmPassword] = useState(false)
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
-
 
   const { register, formState: { errors }, handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
@@ -104,7 +95,7 @@ const SignUpForm = () => {
 
   return (
     <div className="container">
-      <h1>SignUp</h1>
+      <h1>Add Doctor</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="fields">
           <TextField
@@ -152,58 +143,32 @@ const SignUpForm = () => {
           {errors.mobileNumber && <p className="err-msg">{errors.mobileNumber.message}</p>}
         </div>
         <div className="fields">
-        <FormControl sx={{  width: '100%' }} variant="outlined" >
-          <InputLabel>Password</InputLabel>
-          <OutlinedInput
-            type={showPassword ? 'text' : 'password'}
-            placeholder='Enter Password'
-            {...register('password', {
-              required: 'Password is required',
-              minLength: { value: 8, message: 'Password must be at least 8 characters' },
-            })}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label={
-                    showPassword ? 'hide the password' : 'display the password'
-                  }
-                  onClick={handleClickShowPassword}
-                >
-                  {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
+          <TextField
+            variant="outlined"
             label="Password"
+            type="password"
+            className="field"
+            placeholder="Enter Password"
+            {...register("password", {
+              required: "Password is required",
+              minLength: { value: 8, message: "Password must be at least 8 characters" },
+            })}
           />
-          {errors.password && <p className='err-msg'>{errors.password.message}</p>}
-        </FormControl>
+          {errors.password && <p className="err-msg">{errors.password.message}</p>}
         </div>
         <div className="fields">
-        <FormControl sx={{  width: '100%' }} variant="outlined" >
-          <InputLabel>Confirm Password</InputLabel>
-          <OutlinedInput
-            type={showConfirmPassword ? 'text' : 'password'}
-            placeholder='Enter Same Password'
-            {...register('confirmPassword', {
-              required: 'Password is required',
+          <TextField
+            variant="outlined"
+            label="Confirm Password"
+            type="password"
+            className="field"
+            placeholder="Enter same password"
+            {...register("confirmPassword", {
+              required: "Password is required",
               validate: (value) => value === watch("password") || "Passwords do not match",
             })}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label={
-                    showConfirmPassword ? 'hide the password' : 'display the password'
-                  }
-                  onClick={handleClickShowConfirmPassword}
-                >
-                  {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Confirm Password"
           />
-          {errors.confirmPassword && <p className='err-msg'>{errors.confirmPassword.message}</p>}
-          </FormControl>
+          {errors.confirmPassword && <p className="err-msg">{errors.confirmPassword.message}</p>}
         </div>
         <div className="fields">
           <FormControl fullWidth>
@@ -215,7 +180,7 @@ const SignUpForm = () => {
               className="field"
               {...register("role", { required: "Role is required" })}
             >
-              <MenuItem value="Patient">Patient</MenuItem>
+              <MenuItem value="Doctor">Doctor</MenuItem>
             </Select>
           </FormControl>
         </div>
@@ -223,13 +188,11 @@ const SignUpForm = () => {
           <Button variant="contained" className="field" type="submit">
             Submit
           </Button>
-          <p className="footer">
-            Already have an account? <span className="highlight" onClick={() => navigate("/login")}>Login</span>
-          </p>
+          
         </div>
       </form>
     </div>
   );
 };
 
-export default SignUpForm;
+export default DoctorForm;

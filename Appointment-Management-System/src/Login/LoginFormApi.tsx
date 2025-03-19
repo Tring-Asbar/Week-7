@@ -10,3 +10,13 @@ export const get_User_By_Email = gql`
     }
   }
 `;
+
+export const login_user = gql`
+  mutation LoginUser($input:loginDetails){
+    login(input:$input){
+      token
+      role
+      name
+    }
+  }
+`
