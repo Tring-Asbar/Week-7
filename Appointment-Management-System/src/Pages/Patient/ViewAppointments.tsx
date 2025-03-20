@@ -164,7 +164,6 @@ const ViewAppointments = () => {
     <div className="appointments-container">
       <h1>Booked Appointments</h1>
 
-      {/* Filter Dropdown */}
         <FormControl variant="outlined" style={{ width: "150px" }}>
           <InputLabel id="filter-label">Filter by Date</InputLabel>
           <Select
@@ -178,6 +177,7 @@ const ViewAppointments = () => {
             <MenuItem value="all">All</MenuItem>
           </Select>
         </FormControl>
+      
 
       <TableContainer component={Paper} className="table-container">
         <Table className="table">
