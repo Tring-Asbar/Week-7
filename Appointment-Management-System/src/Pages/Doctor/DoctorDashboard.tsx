@@ -2,16 +2,22 @@ import { useQuery } from "@apollo/client";
 import { RadialBarChart, RadialBar, Tooltip, Legend} from "recharts";
 import { Card } from "@mui/material";
 import { get_Appointments_Count } from "../Admin/AppointmentsCountApi";
+import { GET_APPOINTMENTS } from "./AppointmentListApi";
 
 
 const TotalAppointmentsChart = () => {
-  const { data:appointments, loading, error } = useQuery(get_Appointments_Count);
+  const doctorName = localStorage.getItem('name')
+
+  const { data: appointments, loading, error } = useQuery(GET_APPOINTMENTS, {
+    variables: { doctor_name: doctorName },
+  });
+
   
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error fetching data!</p>;
 
-  const totalAppointments = appointments?.getAppointmentsCount?.count || 0;
+  const totalAppointments = appointments?.getAppointments?.length || 0;
 
 
 

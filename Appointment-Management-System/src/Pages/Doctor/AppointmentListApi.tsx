@@ -8,6 +8,7 @@ query GetAppointments($doctor_name: String!) {
    patient_location
    patient_disease
    patient_selecteddoctors
+   is_approved
  }
 }
 `;

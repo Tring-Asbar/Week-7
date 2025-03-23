@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Button, TextField,FormControl,MenuItem, Select,IconButton,InputLabel,OutlinedInput,InputAdornment } from '@mui/material';
+import { Button, TextField,FormControl,IconButton,InputLabel,OutlinedInput,InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import "../StyleComponents/UserForm.scss";
@@ -40,7 +40,7 @@ const SignUpForm = () => {
       password: "",
       confirmPassword: "",
       mobileNumber: "",
-      role: "",
+      role: "Patient",
     },
     mode: "onChange",
   });
@@ -206,19 +206,17 @@ const SignUpForm = () => {
           </FormControl>
         </div>
         <div className="fields">
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Role</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Role"
-              className="field"
-              {...register("role", { required: "Role is required" })}
-            >
-              <MenuItem value="Patient">Patient</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
+          <TextField
+            variant="outlined"
+            label="Role"
+            type="text"
+            className="field"
+            placeholder="Enter Role"
+            {...register("role")}
+            InputProps={{ readOnly: true }}
+          />
+          {errors.role && <p className="err-msg">{errors.role.message}</p>}
+          </div>
         <div className="fields">
           <Button variant="contained" className="field" type="submit">
             Submit

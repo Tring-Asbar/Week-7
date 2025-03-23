@@ -1,52 +1,41 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-} from "@mui/material";
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+// import { useState, useEffect } from "react";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import ToastMessage from "../../Toast/ToastMessage";
-import { APPROVE_APPOINTMENT } from "./ApproveAppointmentApi";
-import { GET_APPOINTMENTS } from "./AppointmentListApi";
+
+const GET_APPOINTMENTS = gql`
+  query GetAppointments($doctor_name: String!) {
+    getAppointments(doctor_name: $doctor_name) {
+      patient_appointmentid
+      patient_name
+      patient_email
+      patient_location
+      patient_disease
+      patient_selecteddoctors
+      patient_appointmenttime
+      is_approved
+    }
+  }
+`;
+
+const APPROVE_APPOINTMENT = gql`
+  mutation ApproveAppointment($patient_email: String!, $patient_name: String!) {
+    approveAppointment(patient_email: $patient_email, patient_name: $patient_name) {
+      success
+      message
+    }
+  }
+`;
 
 const AppointmentsList = () => {
-  // Get doctor's name from localStorage (used for storing approvals)
   const name = localStorage.getItem("name");
 
-  // Fetch appointments data with Apollo Query
-  const { data, loading, error } = useQuery(GET_APPOINTMENTS, {
+  const { data, loading, error, refetch } = useQuery(GET_APPOINTMENTS, {
     variables: { doctor_name: name },
   });
 
-  console.log(data);
-
-  // State to track approval status for each appointment
-  const [approvedAppointments, setApprovedAppointments] = useState<{
-    [key: string]: boolean;
-  }>({});
-
-  // Load approvedAppointments from localStorage on component mount
-  useEffect(() => {
-    if (name) {
-      const storedApprovals = localStorage.getItem(
-        `approvedAppointments_${name}`
-      );
-      if (storedApprovals) {
-        setApprovedAppointments(JSON.parse(storedApprovals));
-      } else {
-        setApprovedAppointments({});
-      }
-    }
-  }, [name]);
-
-  // Apollo Mutation for Approve Appointment
   const [approveAppointment] = useMutation(APPROVE_APPOINTMENT);
 
-  // Handle Approval Logic
   const handleApprove = async (appointment: any) => {
     try {
       const { data } = await approveAppointment({
@@ -57,57 +46,26 @@ const AppointmentsList = () => {
       });
 
       if (data.approveAppointment.success) {
-        // Get existing approvals for the current doctor
-        const storedApprovals =
-          JSON.parse(
-            localStorage.getItem(`approvedAppointments_${name}`) || "{}"
-          );
-
-        // Update approval state
-        const updatedApprovals = {
-          ...storedApprovals,
-          [appointment.patient_email]: true,
-        };
-
-        setApprovedAppointments(updatedApprovals);
-
-        // Save updated approvals to localStorage for this doctor
-        localStorage.setItem(
-          `approvedAppointments_${name}`,
-          JSON.stringify(updatedApprovals)
-        );
-
         ToastMessage({
-          message: "Approval email sent successfully!",
+          message: "Appointment approved successfully!",
           toastType: "success",
         });
+        refetch(); // Refresh data to update status
       } else {
         ToastMessage({
-          message: "Failed to send approval email.",
+          message: "Failed to approve appointment.",
           toastType: "error",
         });
       }
     } catch (error) {
-      console.error("Approval error:", error);
+      console.error("Error approving appointment:", error);
       ToastMessage({
-        message: "Error sending email.",
+        message: "Error approving appointment.",
         toastType: "error",
       });
     }
   };
 
-  // Cancel Appointment Logic (Optional)
-  const cancelAppointment = (appointment: any) => {
-    console.log("Appointment cancelled:", appointment);
-    ToastMessage({
-      message: "Appointment cancelled successfully!",
-      toastType: "info",
-    });
-  };
-
-  
-
-  // Show loading or error messages
   if (loading) return <p>Loading appointments...</p>;
   if (error) return <p>Error fetching appointments!</p>;
 
@@ -124,14 +82,14 @@ const AppointmentsList = () => {
                   <TableCell className="table-header-cell">Email</TableCell>
                   <TableCell className="table-header-cell">Location</TableCell>
                   <TableCell className="table-header-cell">Disease</TableCell>
-                  <TableCell className="table-header-cell">Doctor</TableCell>
+                  <TableCell className="table-header-cell">Time</TableCell>
                   <TableCell className="table-header-cell">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
                 {data?.getAppointments?.map((appointment: any) => (
                   <TableRow
-                    key={appointment.patient_email}
+                    key={appointment.patient_appointmentid}
                     className="table-row"
                   >
                     <TableCell className="table-cell">
@@ -147,30 +105,24 @@ const AppointmentsList = () => {
                       {appointment.patient_disease}
                     </TableCell>
                     <TableCell className="table-cell">
-                      {appointment.patient_selecteddoctors}
+                      {appointment.patient_appointmenttime}
                     </TableCell>
+
+                    {/* Approve Button or Status */}
                     <TableCell className="table-cell">
-                      {approvedAppointments[appointment.patient_email] ? (
-                        <h2 style={{ padding:'2%', color: "green" }}> Approved</h2>
+                      {appointment.is_approved ? (
+                        <h2 style={{ padding: "2%", color: "green" }}>
+                          Approved
+                        </h2>
                       ) : (
-                        <>
-                          <Button
-                            className="action-btn"
-                            variant="outlined"
-                            color="error"
-                            onClick={() => cancelAppointment(appointment)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            className="action-btn"
-                            variant="contained"
-                            color="success"
-                            onClick={() => handleApprove(appointment)}
-                          >
-                            Approve
-                          </Button>
-                        </>
+                        <Button
+                          className="action-btn"
+                          variant="contained"
+                          color="success"
+                          onClick={() => handleApprove(appointment)}
+                        >
+                          Approve
+                        </Button>
                       )}
                     </TableCell>
                   </TableRow>

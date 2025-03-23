@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.scss'
 import App from './App.tsx'
 import {BrowserRouter} from 'react-router-dom'
-import {ApolloClient,InMemoryCache,ApolloProvider} from   '@apollo/client'
+import {ApolloClient,InMemoryCache,ApolloProvider} from '@apollo/client'
 import { ToastContainer } from 'react-toastify';
 
 

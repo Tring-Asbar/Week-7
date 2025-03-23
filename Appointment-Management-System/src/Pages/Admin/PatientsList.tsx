@@ -22,7 +22,7 @@ const PatientsList = () => {
     <div className="dashboard-container">
       <div className="main-content">
         <h1>List of Patients</h1>
-        <div className="patientsList">
+      <div className="patientsList">
       <TableContainer component={Paper} className="table-container">
         <Table className="table">
             <TableHead className="table-header">

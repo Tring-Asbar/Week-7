@@ -1,7 +1,8 @@
+// DoctorForm.tsx
 import { useEffect, useState, useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Button, InputLabel, FormControl, MenuItem, Select, TextField } from "@mui/material";
-import "../../StyleComponents/UserForm.scss"
+import { Button, InputLabel, FormControl, MenuItem, Select, TextField, DialogActions } from "@mui/material";
+import "../../StyleComponents/UserForm.scss";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ToastMessage from "../../Toast/ToastMessage";
@@ -18,9 +19,11 @@ interface FormData {
   role: string;
 }
 
+interface DoctorFormProps {
+  onClose: () => void;
+}
 
-
-const DoctorForm = () => {
+const DoctorForm: React.FC<DoctorFormProps> = ({ onClose }) => {
   const navigate = useNavigate();
   const [id, setId] = useState<string | null>(null);
 
@@ -42,10 +45,9 @@ const DoctorForm = () => {
     setId(null);
     setId(uuidv4());
     console.log("Generated UUID:", id);
-
   };
 
-  // Function to hash the password before submitting
+  // Hash password before submitting
   const hashPassword = async (password: string): Promise<string> => {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
@@ -54,21 +56,20 @@ const DoctorForm = () => {
   const onSubmit: SubmitHandler<FormData> = useCallback(async (values) => {
     generateId();
     console.log("User Data:", values);
-    console.log("uuid", id);
+    console.log("UUID:", id);
 
     try {
-      // Hash the password before sending to the server
       const hashedPassword = await hashPassword(values.password);
 
       const { data } = await createUser({
         variables: {
-          input:{
-          user_name: values.name,
-          user_email: values.email,
-          user_phone: values.mobileNumber,
-          user_password: hashedPassword,  // Send hashed password
-          user_role: values.role,
-          }
+          input: {
+            user_name: values.name,
+            user_email: values.email,
+            user_phone: values.mobileNumber,
+            user_password: hashedPassword,
+            user_role: values.role,
+          },
         },
       });
 
@@ -185,10 +186,14 @@ const DoctorForm = () => {
           </FormControl>
         </div>
         <div className="fields">
-          <Button variant="contained" className="field" type="submit">
-            Submit
-          </Button>
-          
+          <DialogActions>
+            <Button variant="outlined" className="field" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="contained" className="field" type="submit">
+              Submit
+            </Button>          
+          </DialogActions>
         </div>
       </form>
     </div>

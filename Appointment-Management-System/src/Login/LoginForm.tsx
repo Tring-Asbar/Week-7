@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import ToastMessage from '../Toast/ToastMessage';
 import { useMutation} from '@apollo/client';
 import { login_user } from './LoginFormApi';
+import Loader from '../Loader';
 
 interface FormData {
   email: string;
@@ -18,7 +19,7 @@ interface FormData {
 const LoginForm = () => {
   const navigate = useNavigate();
   const [showPassword,setShowPassword] = useState(false)
-
+  const [loading,setLoading] = useState(false); 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const { register, formState: { errors }, handleSubmit, watch, setValue } = useForm<FormData>({
@@ -32,6 +33,7 @@ const LoginForm = () => {
   const [login] = useMutation(login_user);
 
   const onSubmit: SubmitHandler<FormData> = useCallback(async (values) => {
+    
     try {
       const { data } = await login({ variables: { input:{ user_email: values.email, user_password: values.password }} });
       console.log(data.login)
@@ -40,11 +42,13 @@ const LoginForm = () => {
         localStorage.setItem('userRole',data.login.role.toLowerCase());
         localStorage.setItem('name',data.login.name)
         console.log(data.login.token)
-        
-  
-        navigate('/patient');
-        window.location.reload();
-        ToastMessage({ message: 'Logged in successfully', toastType: 'success' });
+        const role = localStorage.getItem('userRole')
+        setLoading(true);
+        setTimeout(() => {
+          navigate(`/${role}`);
+          window.location.reload();
+          ToastMessage({ message: 'Logged in successfully', toastType: 'success' });
+        },3000)
       } else {
         ToastMessage({ message: 'Invalid credentials', toastType: 'error' });
       }
@@ -62,7 +66,8 @@ const LoginForm = () => {
   }, [pwd, setValue]);
 
   return (
-    <div className='login'>
+    
+    (!loading ? <div className='login'>
       <div>
         <h1>Login</h1>
       </div>
@@ -126,7 +131,8 @@ const LoginForm = () => {
           </p>
         </div>
       </form>
-    </div>
+    </div> : <Loader />)
+    
   );
 };
 

@@ -47,7 +47,7 @@ const AppointmentHistory = () => {
               </Typography>
             </CardContent>
             <CardContent>
-                <Button variant='contained'><RemoveRedEyeIcon/> View</Button>
+                <Button variant='contained'>View</Button>
             </CardContent>
           </Card>
         ))

@@ -32,13 +32,15 @@ function App() {
     { path: "/admin/doctorlist", element: <DoctorsList />, allowedRoles: ["admin"] },
     { path: "/admin/patientlist", element: <PatientsList />, allowedRoles: ["admin"] },
     { path: "/admin/adddoctor", element: <AddDoctor/>, allowedRoles: ["admin"] },
+
     { path: "/doctor", element: <DoctorDashboard />, allowedRoles: ["doctor"] },
     { path: "/doctor/appointments", element: <AppointmentsList />, allowedRoles: ["doctor"] },
     { path: "/doctor/profile", element:<DoctorProfile/>, allowedRoles :["doctor"]},
+    
     { path: "/patient", element: <PatientDashboard />, allowedRoles: ["patient"] },
     { path: "/patient/bookings", element: <AppointmentBooking />, allowedRoles: ["patient"] },
-    { path: "/patient/viewappointments", element:<ViewAppointments/>, allowedRoles: ['patient']},
-    { path: "/patient/history", element:<AppointmentHistory/>,allowedRoles:['patient']}
+    { path: "/patient/viewappointments", element: <ViewAppointments/>, allowedRoles: ['patient']},
+    { path: "/patient/history", element: <AppointmentHistory/>,allowedRoles:['patient']}
   ];
   // localStorage.clear()
   return (

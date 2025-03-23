@@ -25,9 +25,10 @@
         justify-content: center;
         align-items: center;
     }
-    .sidebar-menu >li:active{
-      background-color: #1976d2;
+    .sidebar-menu > li:active {
+      background-color: #1976d2 !important;
     }
+    
     a{
         all: unset;
         color: white;
@@ -177,3 +178,7 @@ text-transform: capitalize !important;
   justify-content: space-between;
 }
 
+svg{
+  position: relative;
+  top: 4px;
+}
