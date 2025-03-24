@@ -1,0 +1,16 @@
+.update{
+    .profile{
+        max-width: 30%;
+        background-color: #f7f3f3;
+        display: flex;
+        border-radius: 5px;
+        // justify-content: center;
+        // align-items: center;
+        padding: 3%;
+        .profile_field{
+            margin: 7% 0% 0% 0%;
+            width: 150%;
+            text-align: center;
+        }
+    }
+}
